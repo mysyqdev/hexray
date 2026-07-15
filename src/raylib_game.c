@@ -18,6 +18,7 @@
 #include <stdio.h>                          // Required for: printf()
 #include <stdlib.h>                         // Required for: 
 #include <string.h>                         // Required for:
+#include <math.h>
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -63,6 +64,8 @@ static int frameCounter = 0;
 #define MELONGREEN (Color){ 48, 98, 48, 255 }
 #define BLACKGREEN (Color){ 15, 56, 15, 255 }
 
+static int maxMelons = 100; 
+
 static int mValue = 1;
 static int clickerValue = 1;
 static int multiplierCost = 15;
@@ -72,10 +75,12 @@ static int clickerMultiplierCost = 55;
 bool isAutoClickerActive = false;
 static float timer = 0.0f;
 
+// Buttons
 static Button melonButton = { 0 };
 static Button melonMultiplierButton = { 0 };
 static Button autoClickerButton = { 0 };
 static Button clickerMultiplierButton = { 0 };
+static Button upgradeBank = { 0 };
 
 static int melonsCounter = 0;
 static Vector2 mousePoint = { 0.0f, 0.0f };
@@ -175,7 +180,8 @@ void UpdateDrawFrame(void)
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) clickerMultiplierButton.isPressed = true;
     }
 
-    if  (melonButton.isPressed) melonsCounter += mValue;
+    if  (melonButton.isPressed) melonsCounter = (int)fmin(melonsCounter + mValue, maxMelons);
+
     if  (melonMultiplierButton.isPressed && melonsCounter >= multiplierCost) {
         melonsCounter -= multiplierCost;
         mValue *= 2;
@@ -193,7 +199,7 @@ void UpdateDrawFrame(void)
     }
 
     if (timer >= 1.0f && isAutoClickerActive) {
-        melonsCounter += clickerValue;
+        melonsCounter = (int)fmin(melonsCounter + clickerValue, maxMelons);
         timer -= 1.0f;
     }
     //----------------------------------------------------------------------------------
